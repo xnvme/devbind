@@ -219,7 +219,7 @@ def device_scan(args):
     for line in proc.stdout.splitlines():
         if not line:
             classcode = int(props.get("classcode", "0"), 16)
-            bdf = props.get("bdf", "")
+            bdf = props.get("slot", "")
             if args.device:
                 matches = args.device == bdf
             else:
