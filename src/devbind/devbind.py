@@ -205,12 +205,12 @@ class Device:
         self.is_used = bool(proc.stdout)
 
 
-def device_scan(args):
+def device_scan(classcode: int, bdf: Optional[str] = None):
     """Yields matching PCIe devices.
 
-    When args.device is set, the class filter is bypassed and the named device
-    is yielded regardless of its class. Otherwise devices whose class matches
-    args.classcode are yielded.
+    When bdf is set, the class filter is bypassed and the named device is
+    yielded regardless of its class. Otherwise devices whose class matches
+    classcode are yielded.
     """
 
     proc = run("lspci -Dvmmnk")
@@ -218,12 +218,10 @@ def device_scan(args):
     props = {}
     for line in proc.stdout.splitlines():
         if not line:
-            classcode = int(props.get("classcode", "0"), 16)
-            bdf = props.get("slot", "")
-            if args.device:
-                matches = args.device == bdf
+            if bdf:
+                matches = bdf == props.get("slot", "")
             else:
-                matches = classcode == args.classcode
+                matches = int(props.get("classcode", "0"), 16) == classcode
             if matches:
                 device = Device.from_dict(props)
                 device.probe_handles()
@@ -253,7 +251,7 @@ def print_props(args, device: Device):
             print(f"  {key}: '{val}'")
 
 
-def unbind(args, device: Device):
+def unbind(device: Device):
     log.info(f"Unbinding({device.bdf}) from '{device.driver}'")
 
     driver_path = Path("/sys") / "bus" / "pci" / "devices" / device.bdf / "driver"
@@ -266,10 +264,10 @@ def unbind(args, device: Device):
     sysfs_write(unbind, device.bdf)
 
 
-def bind(args, device: Device, driver_name: str):
+def bind(device: Device, driver_name: str):
     """Bind the driver named 'driver_name' with 'device'"""
 
-    unbind(args, device)
+    unbind(device)
 
     log.info(f"Binding({device.bdf}) to '{driver_name}'")
 
@@ -372,7 +370,7 @@ def main():
     if args.list:
         system.pp()
 
-    devices = list(device_scan(args))
+    devices = list(device_scan(args.classcode, args.device))
 
     try:
         for cur, device in enumerate(devices, 1):
@@ -385,13 +383,13 @@ def main():
                 if device.is_used:
                     log.info(f"Skipping unbind({device.driver}); device is in use.")
                 else:
-                    unbind(args, device)
+                    unbind(device)
 
             if args.bind:
                 if device.is_used:
                     log.info(f"Skipping bind({args.bind}); device is in use.")
                 else:
-                    bind(args, device, args.bind)
+                    bind(device, args.bind)
     except PermissionError as exc:
         log.error(str(exc))
         log.error("Binding/unbinding PCIe devices requires root. Re-run with sudo.")
