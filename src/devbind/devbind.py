@@ -28,7 +28,7 @@ from typing import Iterable, Optional
 from pathlib import Path
 from dataclasses import dataclass, asdict, field
 
-__version__ = "0.3.10"
+__version__ = "0.4.0"
 
 PCIE_DEFAULT_CLASSCODE = 0x0108  # Mass Storage - NVM
 
