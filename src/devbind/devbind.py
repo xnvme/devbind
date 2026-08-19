@@ -420,22 +420,36 @@ def main():
         format="# %(levelname)s: %(message)s",
     )
 
+    try:
+        platform = get_platform()
+    except NotImplementedError as exc:
+        log.error(str(exc))
+        sys.exit(errno.ENOSYS)
+
+    # Before the root check: an unsupported driver-name is the error the user
+    # can act on, and re-running under sudo would not change it
+    if isinstance(args.bind, str) and args.bind not in platform.driver_names():
+        log.error(
+            f"driver '{args.bind}' is not supported on this platform; "
+            f"expected one of: {', '.join(sorted(platform.driver_names()))}"
+        )
+        sys.exit(errno.EINVAL)
+
     if (args.bind or args.unbind) and os.geteuid() != 0:
         log.error("Binding/unbinding PCIe devices requires root. Re-run with sudo.")
         sys.exit(errno.EPERM)
 
-    platform = get_platform()
-
     system = System()
-    system.drivers = platform.probe_drivers()
-    system.probe_limits(platform.memlock_remediation_hint())
-
-    if args.list:
-        system.pp()
-
-    devices = list(platform.scan_devices(args.classcode, args.device))
 
     try:
+        system.drivers = platform.probe_drivers()
+        system.probe_limits(platform.memlock_remediation_hint())
+
+        if args.list:
+            system.pp()
+
+        devices = list(platform.scan_devices(args.classcode, args.device))
+
         for cur, device in enumerate(devices, 1):
             log.info(f"Device({device.bdf}) -- {cur}/{len(devices)}")
 
@@ -457,6 +471,9 @@ def main():
         log.error(str(exc))
         log.error("Binding/unbinding PCIe devices requires root. Re-run with sudo.")
         sys.exit(errno.EPERM)
+    except OSError as exc:
+        log.error(str(exc))
+        sys.exit(exc.errno or 1)
 
 
 if __name__ == "__main__":
