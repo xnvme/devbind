@@ -1,4 +1,4 @@
-![devbind: inspect and control PCI device-driver binding in Linux](https://raw.githubusercontent.com/xnvme/devbind/main/assets/banner.svg)
+![devbind: inspect and control PCI device-driver binding](https://raw.githubusercontent.com/xnvme/devbind/main/assets/banner.svg)
 
 # devbind
 
