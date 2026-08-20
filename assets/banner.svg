@@ -7,5 +7,5 @@
 <text x="16" y="111" fill="#00ffff" textLength="518.4" lengthAdjust="spacingAndGlyphs" xml:space="preserve">██████╔╝███████╗ ╚████╔╝ ██████╔╝██║██║ ╚████║██████╔╝</text>
 <text x="16" y="130" fill="#5fffff" textLength="518.4" lengthAdjust="spacingAndGlyphs" xml:space="preserve">╚═════╝ ╚══════╝  ╚═══╝  ╚═════╝ ╚═╝╚═╝  ╚═══╝╚═════╝ </text>
 <text x="16" y="149" fill="#87ffff" textLength="518.4" lengthAdjust="spacingAndGlyphs" xml:space="preserve">                                                      </text>
-<text x="16.0" y="172" fill="#87ffff" font-style="italic" textLength="518.4" lengthAdjust="spacingAndGlyphs" xml:space="preserve">inspect and control PCI device-driver binding in Linux</text>
+<text x="59.2" y="172" fill="#87ffff" font-style="italic" textLength="432.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">inspect and control PCI device-driver binding</text>
 </svg>
